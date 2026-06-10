@@ -25,3 +25,19 @@ export const useUpdateProfile = () => {
     },
   });
 };
+
+export const useUpdateAvatar = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (file: Blob) => {
+      const formData = new FormData();
+      formData.append("file", file, "avatar.jpg");
+      const { data } = await axios.post<ApiResponse<{ avatarUrl: string }>>("/api/profile/avatar", formData);
+      return data.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
+    },
+  });
+};
+
