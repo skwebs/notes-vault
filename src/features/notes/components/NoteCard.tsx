@@ -1,7 +1,7 @@
 import { NoteWithRelations } from "@/repositories/NoteRepository";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Archive, ArchiveRestore, Trash2, Edit, Paperclip } from "lucide-react";
+import { Archive, ArchiveRestore, Trash2, Edit, Paperclip, ExternalLink, Download, FileText, Image as ImageIcon } from "lucide-react";
 import { useArchiveNote, useRestoreNote, useDeleteNote } from "../api/useNotes";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
@@ -73,22 +73,68 @@ export function NoteCard({ note, onEdit }: NoteCardProps) {
           </Button>
         </div>
       </CardHeader>
-      <CardContent>
-        <p className="text-sm line-clamp-3 text-muted-foreground mb-4">
+      <CardContent className="space-y-4">
+        <p className="text-sm line-clamp-3 text-muted-foreground">
           {note.content || "No content"}
         </p>
-        <div className="flex flex-wrap gap-1 items-center">
+
+        {note.attachments && note.attachments.length > 0 && (
+          <div className="space-y-2">
+            <div className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
+              <Paperclip className="w-3 h-3" />
+              <span>Attachments ({note.attachments.length})</span>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              {note.attachments.map((attachment) => {
+                const isImage = attachment.fileType?.startsWith("image/");
+                return (
+                  <div key={attachment.id} className="group relative border rounded-md overflow-hidden bg-muted/50 h-20">
+                    {isImage ? (
+                      <img 
+                        src={attachment.fileUrl} 
+                        alt="attachment" 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex flex-col items-center justify-center p-2 text-center">
+                        <FileText className="w-6 h-6 text-muted-foreground mb-1" />
+                        <span className="text-[10px] truncate w-full px-1 font-mono uppercase">
+                          {attachment.fileType?.split("/")[1] || "FILE"}
+                        </span>
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                      <a 
+                        href={attachment.fileUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="p-1.5 bg-background rounded-full hover:bg-accent text-foreground transition-colors"
+                        title="View"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </a>
+                      <a 
+                        href={attachment.fileUrl} 
+                        download
+                        className="p-1.5 bg-background rounded-full hover:bg-accent text-foreground transition-colors"
+                        title="Download"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                      </a>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        <div className="flex flex-wrap gap-1 items-center pt-2 border-t">
           {note.tags?.map((nt) => (
             <Badge key={nt.tagId} variant="secondary" className="text-[10px] px-1.5 py-0">
               {nt.tag.name}
             </Badge>
           ))}
-          {note.attachments && note.attachments.length > 0 && (
-            <div className="flex items-center gap-1 ml-auto text-xs text-muted-foreground">
-              <Paperclip className="w-3 h-3" />
-              {note.attachments.length}
-            </div>
-          )}
         </div>
       </CardContent>
     </Card>
