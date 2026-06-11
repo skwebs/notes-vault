@@ -34,71 +34,86 @@ export function RegisterForm() {
       await axios.post("/api/auth/register", data);
       toast.success("Account created successfully. Please login.");
       router.push("/login");
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "Registration failed");
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data?.message || "Registration failed");
+      } else {
+        toast.error("Registration failed");
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle>Register</CardTitle>
-        <CardDescription>Create an account to start using Notes Vault.</CardDescription>
+    <Card className="border-none shadow-xl ring-1 ring-foreground/5">
+      <CardHeader className="space-y-1 pb-6">
+        <CardTitle className="text-2xl font-semibold tracking-tight">Register</CardTitle>
+        <CardDescription className="text-muted-foreground">
+          Create an account to start using Notes Vault
+        </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit(onSubmit)}>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
+            <Label htmlFor="name" className="text-sm font-medium">Name</Label>
             <Input
               id="name"
               type="text"
               placeholder="John Doe"
+              className="h-11 px-4 focus-visible:ring-primary/20"
               {...register("name")}
             />
-            {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
+            {errors.name && <p className="text-xs font-medium text-destructive">{errors.name.message}</p>}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email" className="text-sm font-medium">Email</Label>
             <Input
               id="email"
               type="email"
               placeholder="name@example.com"
+              className="h-11 px-4 focus-visible:ring-primary/20"
               {...register("email")}
             />
-            {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
+            {errors.email && <p className="text-xs font-medium text-destructive">{errors.email.message}</p>}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password" title="Password" className="text-sm font-medium">Password</Label>
             <div className="relative">
               <Input
                 id="password"
                 type={showPassword ? "text" : "password"}
+                placeholder="••••••••"
                 {...register("password")}
-                className="pr-10"
+                className="h-11 pl-4 pr-12 focus-visible:ring-primary/20"
               />
               <button
                 type="button"
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                className="absolute right-0 top-0 h-full px-3 py-2 text-muted-foreground hover:text-foreground transition-colors"
                 onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
               >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
             </div>
-            {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
+            {errors.password && <p className="text-xs font-medium text-destructive">{errors.password.message}</p>}
           </div>
         </CardContent>
-        <CardFooter className="mt-6 flex flex-col gap-4">
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? "Creating account..." : "Register"}
+        <CardFooter className="flex flex-col gap-4 pt-6">
+          <Button type="submit" className="h-11 w-full text-base font-semibold transition-all hover:opacity-90 active:scale-[0.98]" disabled={isLoading}>
+            {isLoading ? (
+              <span className="flex items-center gap-2">
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                Creating account...
+              </span>
+            ) : "Register"}
           </Button>
-          <p className="text-sm text-center text-muted-foreground">
+          <div className="text-sm text-center text-muted-foreground">
             Already have an account?{" "}
-            <Link href="/login" className="text-primary hover:underline">
+            <Link href="/login" className="font-medium text-primary hover:underline underline-offset-4">
               Login
             </Link>
-          </p>
+          </div>
         </CardFooter>
       </form>
     </Card>
