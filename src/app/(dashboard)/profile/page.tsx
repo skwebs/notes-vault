@@ -110,7 +110,7 @@ export default function ProfilePage() {
                 />
               </div>
             </CardContent>
-            <CardFooter>
+            <CardFooter className="mt-6">
               <Button type="submit" className="w-full" disabled={updateProfile.isPending}>
                 {updateProfile.isPending ? "Saving..." : "Save Changes"}
               </Button>

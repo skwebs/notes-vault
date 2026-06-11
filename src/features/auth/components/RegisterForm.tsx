@@ -89,7 +89,7 @@ export function RegisterForm() {
             {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
           </div>
         </CardContent>
-        <CardFooter className="flex flex-col gap-4">
+        <CardFooter className="mt-6 flex flex-col gap-4">
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? "Creating account..." : "Register"}
           </Button>

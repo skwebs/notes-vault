@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import Cropper, { ReactCropperElement } from "react-cropper";
 import "cropperjs/dist/cropper.css";
 import { Button } from "@/components/ui/button";
@@ -45,12 +45,18 @@ export function ImageCropper({ image, onCrop, onCancel, open }: ImageCropperProp
 
   return (
     <Dialog open={open} onOpenChange={(val) => !val && onCancel()}>
-      <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden bg-black">
-        <DialogHeader className="p-4 text-white">
+      <DialogContent className="sm:max-w-[500px] p-0 gap-0 overflow-hidden">
+        <DialogHeader className="p-4 border-b">
           <DialogTitle>Crop Avatar</DialogTitle>
         </DialogHeader>
         
-        <div className="relative aspect-square w-full bg-black flex items-center justify-center">
+        <div 
+          className="relative aspect-square w-full bg-muted flex items-center justify-center overflow-hidden"
+          style={{
+            backgroundImage: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAAA3NCSVQICAjb4U/gAAAABlBMVEXMzMz////TjRV2AAAACXBIWXMAAArrAAAK6wGCiw1aAAAAHHRFWHRTb2Z0d2FyZQBBZG9iZSBGaXJld29ya3MgQ1M26LyyjAAAABFJREFUCJlj+M/AgBVhF/0PAH6/D/HkDxOGAAAAAElFTkSuQmCC')",
+            backgroundRepeat: "repeat"
+          }}
+        >
           <Cropper
             src={image}
             style={{ height: "100%", width: "100%" }}
@@ -61,7 +67,7 @@ export function ImageCropper({ image, onCrop, onCancel, open }: ImageCropperProp
             viewMode={1}
             dragMode="move"
             autoCropArea={1}
-            background={false}
+            background={true}
             responsive={true}
             checkOrientation={false}
           />
@@ -85,7 +91,7 @@ export function ImageCropper({ image, onCrop, onCancel, open }: ImageCropperProp
           </Button>
         </div>
 
-        <DialogFooter className="p-4 pt-0 bg-background">
+        <DialogFooter className="mt-6 p-4 pt-0 bg-background">
           <Button variant="ghost" onClick={onCancel}>Cancel</Button>
           <Button onClick={handleCrop}>Crop & Save</Button>
         </DialogFooter>
