@@ -1,5 +1,6 @@
 import { cloudinary } from "@/lib/cloudinary";
 import { attachmentRepository } from "@/repositories/AttachmentRepository";
+import { logger } from "@/lib/logger";
 
 export class UploadService {
   async uploadFile(file: File, noteId: string) {
@@ -54,7 +55,23 @@ export class UploadService {
   }
 
   async deleteFile(publicId: string, resourceType: string = "image") {
-    return await cloudinary.uploader.destroy(publicId, { resource_type: resourceType });
+    try {
+      logger.info({ publicId, resourceType }, "Deleting Cloudinary file");
+      const result = await cloudinary.uploader.destroy(publicId, { 
+        resource_type: resourceType,
+        invalidate: true 
+      });
+      logger.info({ publicId, resourceType, result }, "Cloudinary deletion result");
+      
+      if (result.result !== "ok" && result.result !== "not found") {
+        throw new Error(`Cloudinary deletion failed: ${result.result}`);
+      }
+      
+      return result;
+    } catch (error) {
+      logger.error(error, "Error in UploadService.deleteFile");
+      throw error;
+    }
   }
 }
 

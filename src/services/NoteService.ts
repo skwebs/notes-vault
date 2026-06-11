@@ -1,6 +1,7 @@
 import { noteRepository, NoteFilters } from "@/repositories/NoteRepository";
 import { NoteInput, UpdateNoteInput } from "@/schemas/notes";
 import { uploadService } from "./UploadService";
+import { logger } from "@/lib/logger";
 
 export class NoteService {
   async getNotes(userId: string, filters: NoteFilters = {}) {
@@ -29,17 +30,22 @@ export class NoteService {
       throw new Error("Note not found");
     }
 
+    logger.info({ noteId: id, attachmentsCount: note.attachments?.length || 0 }, "Starting note deletion");
+
     // Delete attachments from Cloudinary
     if (note.attachments && note.attachments.length > 0) {
       for (const attachment of note.attachments) {
         if (attachment.publicId) {
           const resourceType = attachment.fileType?.split("/")[0] || "image";
+          logger.debug({ attachmentId: attachment.id, publicId: attachment.publicId, resourceType }, "Processing attachment deletion");
           await uploadService.deleteFile(attachment.publicId, resourceType);
         }
       }
     }
 
-    return await noteRepository.delete(id, userId);
+    const deletedNote = await noteRepository.delete(id, userId);
+    logger.info({ noteId: id }, "Note deleted from database");
+    return deletedNote;
   }
 
   async archiveNote(id: string, userId: string) {
