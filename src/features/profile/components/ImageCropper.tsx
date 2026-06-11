@@ -60,8 +60,12 @@ export function ImageCropper({ image, onSuccess, onCancel, open }: ImageCropperP
           signal: abortControllerRef.current.signal,
         });
 
-        toast.success("Avatar updated successfully");
-        onSuccess(data.avatarUrl);
+        if (data?.avatarUrl) {
+          toast.success("Avatar updated successfully");
+          onSuccess(data.avatarUrl);
+        } else {
+          throw new Error("Invalid response from server");
+        }
       } catch (error: any) {
         if (error.name === "CanceledError" || error.name === "AbortError") {
           return;
