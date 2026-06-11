@@ -41,14 +41,8 @@ export default function ProfilePage() {
     }
   };
 
-  const handleCrop = async (blob: Blob) => {
-    try {
-      await updateAvatar.mutateAsync(blob);
-      toast.success("Avatar updated");
-      setSelectedImage(null);
-    } catch {
-      toast.error("Failed to upload avatar");
-    }
+  const handleCropSuccess = (avatarUrl: string) => {
+    setSelectedImage(null);
   };
 
   if (isLoading) {
@@ -124,7 +118,7 @@ export default function ProfilePage() {
           image={selectedImage}
           open={!!selectedImage}
           onCancel={() => setSelectedImage(null)}
-          onCrop={handleCrop}
+          onSuccess={handleCropSuccess}
         />
       )}
     </div>

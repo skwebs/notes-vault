@@ -29,10 +29,18 @@ export const useUpdateProfile = () => {
 export const useUpdateAvatar = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (file: Blob) => {
+    mutationFn: async ({ file, onProgress, signal }: { file: Blob; onProgress?: (progress: number) => void; signal?: AbortSignal }) => {
       const formData = new FormData();
       formData.append("file", file, "avatar.jpg");
-      const { data } = await axios.post<ApiResponse<{ avatarUrl: string }>>("/api/profile/avatar", formData);
+      const { data } = await axios.post<ApiResponse<{ avatarUrl: string }>>("/api/profile/avatar", formData, {
+        onUploadProgress: (progressEvent) => {
+          if (onProgress && progressEvent.total) {
+            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            onProgress(percentCompleted);
+          }
+        },
+        signal,
+      });
       return data.data;
     },
     onSuccess: () => {
