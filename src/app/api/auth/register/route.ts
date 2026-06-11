@@ -18,15 +18,16 @@ export async function POST(req: Request) {
     };
 
     return NextResponse.json(response, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error(error, "Registration error");
     
-    if (error.name === "ZodError") {
+    if (error && typeof error === 'object' && 'name' in error && error.name === "ZodError") {
+      const zodError = error as import("zod").ZodError;
       return NextResponse.json(
         {
           success: false,
           message: "Validation failed",
-          errors: error.flatten().fieldErrors,
+          errors: zodError.flatten().fieldErrors,
         },
         { status: 400 }
       );
@@ -35,7 +36,7 @@ export async function POST(req: Request) {
     return NextResponse.json(
       {
         success: false,
-        message: error.message || "Internal server error",
+        message: error instanceof Error ? error.message : "Internal server error",
       },
       { status: 500 }
     );

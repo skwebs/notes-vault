@@ -1,5 +1,5 @@
 import { userRepository } from "@/repositories/UserRepository";
-import { RegisterInput, registerSchema } from "@/schemas/auth";
+import { RegisterInput } from "@/schemas/auth";
 import bcrypt from "bcryptjs";
 import { logger } from "@/lib/logger";
 

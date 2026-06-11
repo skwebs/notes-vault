@@ -1,7 +1,7 @@
 import { NoteWithRelations } from "@/repositories/NoteRepository";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Archive, ArchiveRestore, Trash2, Edit, Paperclip, ExternalLink, Download, FileText, Image as ImageIcon } from "lucide-react";
+import { Archive, ArchiveRestore, Trash2, Edit, Paperclip, ExternalLink, Download, FileText } from "lucide-react";
 import { useArchiveNote, useRestoreNote, useDeleteNote } from "../api/useNotes";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";

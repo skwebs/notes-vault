@@ -53,8 +53,8 @@ export class UploadService {
     });
   }
 
-  async deleteFile(publicId: string) {
-    return await cloudinary.uploader.destroy(publicId);
+  async deleteFile(publicId: string, resourceType: string = "image") {
+    return await cloudinary.uploader.destroy(publicId, { resource_type: resourceType });
   }
 }
 

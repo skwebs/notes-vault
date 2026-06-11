@@ -1,5 +1,6 @@
 import { noteRepository, NoteFilters } from "@/repositories/NoteRepository";
 import { NoteInput, UpdateNoteInput } from "@/schemas/notes";
+import { uploadService } from "./UploadService";
 
 export class NoteService {
   async getNotes(userId: string, filters: NoteFilters = {}) {
@@ -23,6 +24,21 @@ export class NoteService {
   }
 
   async deleteNote(id: string, userId: string) {
+    const note = await noteRepository.findById(id, userId);
+    if (!note) {
+      throw new Error("Note not found");
+    }
+
+    // Delete attachments from Cloudinary
+    if (note.attachments && note.attachments.length > 0) {
+      for (const attachment of note.attachments) {
+        if (attachment.publicId) {
+          const resourceType = attachment.fileType?.split("/")[0] || "image";
+          await uploadService.deleteFile(attachment.publicId, resourceType);
+        }
+      }
+    }
+
     return await noteRepository.delete(id, userId);
   }
 

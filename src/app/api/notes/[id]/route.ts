@@ -17,10 +17,16 @@ export async function GET(
 
     const note = await noteService.getNote(id, session.user.id);
     return NextResponse.json({ success: true, message: "Note retrieved", data: note });
-  } catch (error: any) {
+  } catch (error: unknown) {
     const { id } = await params;
     logger.error(error, `GET /api/notes/${id} error`);
-    return NextResponse.json({ success: false, message: error.message || "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { 
+        success: false, 
+        message: error instanceof Error ? error.message : "Internal server error" 
+      }, 
+      { status: 500 }
+    );
   }
 }
 
@@ -40,13 +46,20 @@ export async function PATCH(
 
     const note = await noteService.updateNote(id, session.user.id, validatedData);
     return NextResponse.json({ success: true, message: "Note updated", data: note });
-  } catch (error: any) {
+  } catch (error: unknown) {
     const { id } = await params;
     logger.error(error, `PATCH /api/notes/${id} error`);
-    if (error.name === "ZodError") {
-      return NextResponse.json({ success: false, message: "Validation failed", errors: error.flatten().fieldErrors }, { status: 400 });
+    if (error && typeof error === 'object' && 'name' in error && error.name === "ZodError") {
+      const zodError = error as import("zod").ZodError;
+      return NextResponse.json({ success: false, message: "Validation failed", errors: zodError.flatten().fieldErrors }, { status: 400 });
     }
-    return NextResponse.json({ success: false, message: error.message || "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { 
+        success: false, 
+        message: error instanceof Error ? error.message : "Internal server error" 
+      }, 
+      { status: 500 }
+    );
   }
 }
 
@@ -63,9 +76,15 @@ export async function DELETE(
 
     await noteService.deleteNote(id, session.user.id);
     return NextResponse.json({ success: true, message: "Note deleted" });
-  } catch (error: any) {
+  } catch (error: unknown) {
     const { id } = await params;
     logger.error(error, `DELETE /api/notes/${id} error`);
-    return NextResponse.json({ success: false, message: error.message || "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { 
+        success: false, 
+        message: error instanceof Error ? error.message : "Internal server error" 
+      }, 
+      { status: 500 }
+    );
   }
 }

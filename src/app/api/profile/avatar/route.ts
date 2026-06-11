@@ -24,8 +24,9 @@ export async function POST(req: Request) {
     await userRepository.update(session.user.id, { avatarUrl: secure_url });
 
     return NextResponse.json({ success: true, message: "Avatar updated", data: { avatarUrl: secure_url } });
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error(error, "POST /api/profile/avatar error");
-    return NextResponse.json({ success: false, message: error.message || "Internal server error" }, { status: 500 });
+    const message = error instanceof Error ? error.message : "Internal server error";
+    return NextResponse.json({ success: false, message }, { status: 500 });
   }
 }

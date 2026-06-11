@@ -17,7 +17,7 @@ export async function GET(req: Request) {
 
     const notes = await noteService.getNotes(session.user.id, { search, tagId });
     return NextResponse.json({ success: true, message: "Notes retrieved", data: notes });
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error(error, "GET /api/notes error");
     return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
   }
@@ -35,10 +35,11 @@ export async function POST(req: Request) {
 
     const note = await noteService.createNote(session.user.id, validatedData);
     return NextResponse.json({ success: true, message: "Note created", data: note }, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error(error, "POST /api/notes error");
-    if (error.name === "ZodError") {
-      return NextResponse.json({ success: false, message: "Validation failed", errors: error.flatten().fieldErrors }, { status: 400 });
+    if (error && typeof error === 'object' && 'name' in error && error.name === "ZodError") {
+      const zodError = error as import("zod").ZodError;
+      return NextResponse.json({ success: false, message: "Validation failed", errors: zodError.flatten().fieldErrors }, { status: 400 });
     }
     return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
   }

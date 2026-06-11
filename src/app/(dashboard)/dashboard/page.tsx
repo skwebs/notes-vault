@@ -14,7 +14,7 @@ export default function DashboardPage() {
   const [editingNote, setEditingNote] = useState<NoteWithRelations | null>(null);
   const [filter, setFilter] = useState<"active" | "archived" | "all">("active");
   const [search, setSearch] = useState("");
-  const [selectedTagId, setSelectedTagId] = useState<string | undefined>();
+  const [selectedTagId] = useState<string | undefined>();
 
   const handleEdit = (note: NoteWithRelations) => {
     setEditingNote(note);

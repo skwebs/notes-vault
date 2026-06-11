@@ -25,8 +25,9 @@ export async function POST(req: Request) {
     const attachment = await uploadService.uploadFile(file, noteId);
 
     return NextResponse.json({ success: true, message: "File uploaded", data: attachment });
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error(error, "POST /api/upload error");
-    return NextResponse.json({ success: false, message: error.message || "Internal server error" }, { status: 500 });
+    const message = error instanceof Error ? error.message : "Internal server error";
+    return NextResponse.json({ success: false, message }, { status: 500 });
   }
 }

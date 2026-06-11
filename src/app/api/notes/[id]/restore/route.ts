@@ -16,9 +16,15 @@ export async function POST(
 
     const note = await noteService.restoreNote(id, session.user.id);
     return NextResponse.json({ success: true, message: "Note restored", data: note });
-  } catch (error: any) {
+  } catch (error: unknown) {
     const { id } = await params;
     logger.error(error, `POST /api/notes/${id}/restore error`);
-    return NextResponse.json({ success: false, message: error.message || "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { 
+        success: false, 
+        message: error instanceof Error ? error.message : "Internal server error" 
+      }, 
+      { status: 500 }
+    );
   }
 }

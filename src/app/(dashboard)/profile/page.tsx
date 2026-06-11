@@ -9,10 +9,13 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Camera, User as UserIcon } from "lucide-react";
+import { Camera, User as UserIcon, ArrowLeft, LayoutDashboard } from "lucide-react";
 import { ImageCropper } from "@/features/profile/components/ImageCropper";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function ProfilePage() {
+  const router = useRouter();
   const { data: profile, isLoading } = useProfile();
   const updateProfile = useUpdateProfile();
   const updateAvatar = useUpdateAvatar();
@@ -20,10 +23,18 @@ export default function ProfilePage() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const handleBack = () => {
+    if (window.history.length > 1) {
+      router.back();
+    } else {
+      router.push("/dashboard");
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await updateProfile.mutateAsync({ name: name || profile?.name });
+      await updateProfile.mutateAsync({ name: name || profile?.name || "" });
       toast.success("Profile updated");
     } catch {
       toast.error("Failed to update profile");
@@ -66,6 +77,19 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-muted/40">
       <Navbar />
       <main className="container px-4 py-8 mx-auto">
+        <div className="flex items-center justify-between max-w-md mx-auto mb-6">
+          <Button variant="outline" size="sm" onClick={handleBack}>
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+          </Button>
+          <Link href="/dashboard">
+            <Button variant="outline" size="sm">
+              <LayoutDashboard className="w-4 h-4 mr-2" />
+              Dashboard
+            </Button>
+          </Link>
+        </div>
+
         <Card className="max-w-md mx-auto">
           <CardHeader className="text-center">
             <div className="relative mx-auto w-24 h-24 mb-4">

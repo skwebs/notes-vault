@@ -15,9 +15,10 @@ export async function GET() {
       return NextResponse.json({ success: false, message: "User not found" }, { status: 404 });
     }
 
-    const { passwordHash, ...safeUser } = user;
+    const { passwordHash: _passwordHash, ...safeUser } = user;
+    void _passwordHash;
     return NextResponse.json({ success: true, message: "Profile retrieved", data: safeUser });
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error(error, "GET /api/profile error");
     return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
   }
@@ -34,10 +35,11 @@ export async function PATCH(req: Request) {
     const { name, avatarUrl } = body;
 
     const user = await userRepository.update(session.user.id, { name, avatarUrl });
-    const { passwordHash, ...safeUser } = user;
+    const { passwordHash: _passwordHash, ...safeUser } = user;
+    void _passwordHash;
 
     return NextResponse.json({ success: true, message: "Profile updated", data: safeUser });
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error(error, "PATCH /api/profile error");
     return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
   }

@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { tagService } from "@/services/TagService";
 import { tagSchema } from "@/schemas/tags";
 import { logger } from "@/lib/logger";
+import { ZodError } from "zod";
 
 export async function GET() {
   try {
@@ -13,7 +14,7 @@ export async function GET() {
 
     const tags = await tagService.getTags();
     return NextResponse.json({ success: true, message: "Tags retrieved", data: tags });
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error(error, "GET /api/tags error");
     return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
   }
@@ -31,9 +32,9 @@ export async function POST(req: Request) {
 
     const tag = await tagService.createTag(validatedData);
     return NextResponse.json({ success: true, message: "Tag created", data: tag }, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error(error, "POST /api/tags error");
-    if (error.name === "ZodError") {
+    if (error instanceof ZodError) {
       return NextResponse.json({ success: false, message: "Validation failed", errors: error.flatten().fieldErrors }, { status: 400 });
     }
     return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
